@@ -19,7 +19,7 @@ class HTMLNode:
         return props_text
     
     def __repr__(self):
-        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+        return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
             
 
 class LeafNode(HTMLNode):
@@ -55,6 +55,9 @@ class ParentNode(HTMLNode):
         else:
             text = "".join(child.to_html() for child in self.children)
             return f"<{self.tag}>{text}</{self.tag}>"
+    
+    def __repr__(self):
+        return f"ParentNode({self.tag}, chidren: {self.children}, {self.props})"
 
             
         
