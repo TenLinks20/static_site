@@ -1,5 +1,6 @@
 import os
 import shutil
+import pathlib
 from textnode import TextNode, TextType
 from htmlnode import ParentNode, LeafNode
 from markdown_blocks import markdown_to_html_node, markdown_to_blocks
@@ -58,7 +59,11 @@ def generate_page(from_path:str, template_path: str, dest_path:str):
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
     
     with open(dest_path, "w", encoding="utf-8") as df:
-        df.write(template_content)      
+        df.write(template_content)  
+
+def generate_pages_recursive(dir_path_content: str, temp_path: str, dest_dir_path: str):
+
+    fpath = pathlib.Path(dir_path_content)    
         
     
 
@@ -66,7 +71,7 @@ def main():
     test_node = TextNode("I'm in the main() function", TextType.LINK, "https://example.com")
     print(test_node)
     cp_content("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    # generate_page("content/index.md", "template.html", "public/index.html")
     
 if __name__ == '__main__':
     main()
