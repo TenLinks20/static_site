@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 from pathlib import Path
 from textnode import TextNode, TextType
@@ -39,7 +40,7 @@ def extract_title(markdown: str):
 
     
 
-def generate_page(from_path:str, template_path: str, dest_path:str):
+def generate_page(from_path:str, template_path: str, dest_path:str, basepath:str):
     print(f"Generating Page from {from_path} to {dest_path} using {template_path}.")
 
     with open(from_path, "r", encoding="utf-8") as ff:
@@ -54,6 +55,9 @@ def generate_page(from_path:str, template_path: str, dest_path:str):
 
     template_content = template_content.replace("{{ Title }}", title)
     template_content = template_content.replace("{{ Content }}", content)
+    template_content = template_content.replace('href="/', f'href="{basepath}')
+    template_content = template_content.replace('src="/', f'src="{basepath}')
+
 
     if os.path.dirname(dest_path):
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
@@ -61,7 +65,7 @@ def generate_page(from_path:str, template_path: str, dest_path:str):
     with open(dest_path, "w", encoding="utf-8") as df:
         df.write(template_content)  
 
-def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str, basepath:str):
 
     dir_path = Path(dir_path_content)
     dest_path = Path(dest_dir_path)
@@ -72,18 +76,19 @@ def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir
             continue
         if file.is_file():
             html_file = file.with_suffix(".html")
-            generate_page(str(file), template_path, str(dest_path / html_file.name))
+            generate_page(str(file), template_path, str(dest_path / html_file.name), basepath)
         else:
-            generate_pages_recursive(str(file), template_path, str(dest_path / f))
+            generate_pages_recursive(str(file), template_path, str(dest_path / f), basepath)
             
         
     
 
 def main():
+    basepath = sys.argv[1] or "/"
     test_node = TextNode("I'm in the main() function", TextType.LINK, "https://example.com")
     print(test_node)
-    cp_content("static", "public")
-    generate_pages_recursive("content", "template.html", "public")
+    cp_content("static", "docs")
+    generate_pages_recursive("content", "template.html", "docs", basepath)
     
 if __name__ == '__main__':
     main()
