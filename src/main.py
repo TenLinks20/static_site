@@ -1,6 +1,6 @@
 import os
 import shutil
-import pathlib
+from pathlib import Path
 from textnode import TextNode, TextType
 from htmlnode import ParentNode, LeafNode
 from markdown_blocks import markdown_to_html_node, markdown_to_blocks
@@ -61,9 +61,21 @@ def generate_page(from_path:str, template_path: str, dest_path:str):
     with open(dest_path, "w", encoding="utf-8") as df:
         df.write(template_content)  
 
-def generate_pages_recursive(dir_path_content: str, temp_path: str, dest_dir_path: str):
+def generate_pages_recursive(dir_path_content: str, template_path: str, dest_dir_path: str):
 
-    fpath = pathlib.Path(dir_path_content)    
+    dir_path = Path(dir_path_content)
+    dest_path = Path(dest_dir_path)
+    for f in os.listdir(dir_path_content):
+        file = dir_path / f
+
+        if file.name.startswith("."):
+            continue
+        if file.is_file():
+            html_file = file.with_suffix(".html")
+            generate_page(str(file), template_path, str(dest_path / html_file.name))
+        else:
+            generate_pages_recursive(str(file), template_path, str(dest_path / f))
+            
         
     
 
@@ -71,7 +83,7 @@ def main():
     test_node = TextNode("I'm in the main() function", TextType.LINK, "https://example.com")
     print(test_node)
     cp_content("static", "public")
-    # generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive("content", "template.html", "public")
     
 if __name__ == '__main__':
     main()
